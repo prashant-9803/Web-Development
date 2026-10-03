@@ -5,7 +5,7 @@ function authMiddleware(req, res, next) {
 
   if (!token) {
     res.status(403).json({
-      message: "You are not logged ing",
+      message: "You are not logged in",
     });
 
     return;
