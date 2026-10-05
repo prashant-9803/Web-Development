@@ -15,8 +15,6 @@ const pool = new Pool({
 })
 
 
-
-
 app.post("/signup", async (req, res) => {
     console.log(req.body)
     const username = req.body.username
@@ -54,7 +52,7 @@ app.post("/signin", async (req, res) => {
         const userExists = await pool.query(`SELECT * from users where email=$1 AND password=$2`, [email, password])
 
         if (!userExists.rows[0]) {
-            res.json({
+            res.status(401).json({
                 message: "invalid creds"
             })
         }

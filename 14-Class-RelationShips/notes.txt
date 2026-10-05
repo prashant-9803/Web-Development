@@ -1,0 +1,12 @@
+# Many-to-Many Relationship: 
+- It requires third table to esablish this relationship.
+eg. In trello app: users and organisation 
+    - org can have multiple members
+    - a user can be part of many orgs
+
+
+## Foreing key contraint: 
+- A key that is primary key of another table 
+- syntax: FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+- ON DELETE CASCADE: delete entries related entries if user deleted
+- ON DELETE RESTRICT: do not delete related entries  
