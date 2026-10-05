@@ -3,22 +3,32 @@ import express from "express";
 import dotenv from "dotenv";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
+import { signinSchema, signupSchema } from "./zodSchemas";
 
+// loads env variables
 dotenv.config();
 
+// application instance
 const app = express();
 
+// middleware to parse json objects
 app.use(express.json());
 
+// initialize connection pool for sql db
 const pool = new Pool({
   connectionString: process.env.DB_URL,
 });
 
 app.post("/signup", async (req, res) => {
-  console.log(req.body);
-  const username = req.body.username;
-  const password = req.body.password;
-  const email = req.body.email;
+  const { username, email, password } = req.body;
+
+  // validate the request body using zod
+  const { data, success, error } = signupSchema.safeParse(req.body);
+  if (!success) {
+    return res.status(400).json({
+      error: error.errors.map((err) => err.message),
+    });
+  }
 
   const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -42,8 +52,15 @@ app.post("/signup", async (req, res) => {
 });
 
 app.post("/signin", async (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
+  const { email, password } = req.body;
+
+  // validate the request body using zod
+  const { data, success, error } = signinSchema.safeParse(req.body);
+  if (!success) {
+    return res.status(400).json({
+      error: error.errors.map((err) => err.message),
+    });
+  }
 
   try {
     // const userExists = await pool.query(`SELECT * from users where email='${email}' AND password='${password}'`)
