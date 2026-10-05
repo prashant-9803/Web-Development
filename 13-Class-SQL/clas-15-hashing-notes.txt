@@ -1,6 +1,0 @@
-Why hashing?
-rainbow table 
-why salt?
-bcrypt lib -> 
-    - hash a password
-    - compare the password 

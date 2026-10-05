@@ -1,0 +1,14 @@
+Why hashing?
+rainbow table 
+why salt?
+bcrypt lib -> 
+    - hash a password
+    - compare the password 
+
+
+
+why zod?
+how to implement ?
+parse and safePasrse
+parse -> throws error -> try catch 
+safePasrse -> return success variable -> 
