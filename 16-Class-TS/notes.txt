@@ -1,0 +1,7 @@
+Typescript Notes
+- what is Typescript
+
+let n: number = 10
+n = "prashant"
+console.log(n)
+- this runs -> npx tsc -> into js
