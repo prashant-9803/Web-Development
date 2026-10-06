@@ -5,3 +5,7 @@ let n: number = 10
 n = "prashant"
 console.log(n)
 - this runs -> npx tsc -> into js
+
+
+commands: 
+npx tsc "filename.ts" ---> converts ts file to js 
