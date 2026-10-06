@@ -16,7 +16,7 @@ app.use(express.json());
 
 // initialize connection pool for sql db
 const pool = new Pool({
-  connectionString: process.env.DB_URL,
+  connectionString: process.env.DATABASE_URL_POOLED,
 });
 
 app.post("/signup", async (req, res) => {
