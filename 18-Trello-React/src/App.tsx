@@ -1,11 +1,23 @@
-import './App.css'
+import LandingNavbar from "./components/landing/LandingNavbar";
+import HeroSection from "./components/landing/HeroSection";
+import BoardPreview from "./components/landing/BoardPreview";
+import FeaturesSection from "./components/landing/FeaturesSection";
+import WorkflowSection from "./components/landing/WorkflowSection";
+import CallToAction from "./components/landing/CallToAction";
+import LandingFooter from "./components/landing/LandingFooter";
 
-function App() {
+export default function App() {
   return (
-    <div className='text-3xl font-bold underline'>
-      Trello App
+    <div className="min-h-screen bg-zinc-50 text-zinc-900 flex flex-col selection:bg-zinc-900 selection:text-white">
+      <LandingNavbar />
+      <main className="flex-1">
+        <HeroSection />
+        <BoardPreview />
+        <FeaturesSection />
+        <WorkflowSection />
+        <CallToAction />
+      </main>
+      <LandingFooter />
     </div>
-  )
+  );
 }
-
-export default App

@@ -1,7 +1,13 @@
 import { useDrag } from "react-dnd";
+import { GripVertical } from "lucide-react";
 
+interface CardProps {
+  id: number;
+  title: string;
+  description: string;
+}
 
-const Card = ({ title, description, id }) => {
+const Card = ({ title, description, id }: CardProps) => {
   const [{ opacity, isDragging }, dragRef] = useDrag(
     () => ({
       type: "CARD",
@@ -15,7 +21,7 @@ const Card = ({ title, description, id }) => {
         isDragging: monitor.isDragging(),
       }),
     }),
-    [id, title, description]
+    [id, title, description],
   );
 
   return (
@@ -28,9 +34,12 @@ const Card = ({ title, description, id }) => {
         isDragging ? "ring-2 ring-blue-400/40 scale-[0.98]" : ""
       }`}
     >
-      <h3 className="text-sm font-medium text-zinc-900 group-hover:text-zinc-950">
-        {title}
-      </h3>
+      <div className="flex items-start justify-between gap-2">
+        <h3 className="text-sm font-medium text-zinc-900 group-hover:text-zinc-950 flex-1">
+          {title}
+        </h3>
+        <GripVertical className="w-3.5 h-3.5 text-zinc-300 group-hover:text-zinc-400 transition-colors shrink-0 mt-0.5" />
+      </div>
       <p className="mt-1 text-xs text-zinc-500 leading-relaxed">
         {description}
       </p>
