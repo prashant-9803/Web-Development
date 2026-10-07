@@ -1,0 +1,5 @@
+### Notes: 
+- npm create vite@latest
+- what is bundler, what is vite
+
+- why react (2013) facebbook
