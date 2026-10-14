@@ -10,13 +10,13 @@ client.connect();
 app.use(express.json());
 
 app.post("/submission", (req, res) => {
-  const { userId, questionId, code, language } = req.body;
+  const { userId, code, language } = req.body;
 
   // put this entry in DB
 
   client.lPush(
     "problems",
-    JSON.stringify({ userId, questionId, code, language }),
+    JSON.stringify({ userId, code, language }),
   );
 
   res.json({

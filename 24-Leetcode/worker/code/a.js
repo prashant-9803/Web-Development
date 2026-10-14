@@ -1,0 +1,1 @@
+ function addNumbers(a, b) {return a + b;};  let sum = addNumbers(5, 62); console.log(sum); 
