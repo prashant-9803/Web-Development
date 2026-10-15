@@ -1,1 +1,4 @@
-print("hello, asdadoj)
+def solution():
+    print("Hello, World!")
+
+solution()

@@ -1,1 +1,4 @@
-console.log("asd");
+function solution() {
+    console.log("Hello, World!");
+}
+
