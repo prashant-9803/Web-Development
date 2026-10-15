@@ -8,6 +8,8 @@ export function App() {
   const [language, setLanguage] = useState("C++");
   const [status, setStatus] = useState("");
   const [output, setOutput] = useState("");
+  const [stdErr, setStdErr] = useState("")
+
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
   async function pollBackend(submissionId: string, counter = 3) {
@@ -22,6 +24,7 @@ export function App() {
     if (response.data.status != "Processing") {
       setStatus(response.data.status);
       setOutput(response.data.response.output);
+      setStdErr(response.data.response.stdErr)
     } else {
       await new Promise<void>((resolve) => {
         setTimeout(() => {
@@ -67,6 +70,7 @@ export function App() {
             onClick={async () => {
               setStatus("Processing");
               setOutput("");
+              setStdErr("")
               const response = await axios.post(`${BACKEND_URL}/submission`, {
                 language: language,
                 code: textAreaRef.current!.value,
@@ -101,7 +105,7 @@ export function App() {
           </p>{" "}
         </div>
         <div className="bg-zinc-800 rounded-3xl h-[80%] mr-4  p-5">
-          {output}
+          {output}  {stdErr}
         </div>
       </div>
     </div>

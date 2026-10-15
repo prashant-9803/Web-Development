@@ -13,6 +13,7 @@ model Submission {
   language String
   status   SubmissionStatus @default(Processing)
   output   String?
+  stdErr   String?
 }
 
 enum SubmissionStatus {

@@ -1,1 +1,1 @@
-console.log("ky be bhen ke lovede");
+console.log("asd");

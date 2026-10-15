@@ -17,7 +17,9 @@ client.connect().then(async () => {
     const { code, language, submissionId } = parsedResponse;
 
     console.log("Processing submission: ", submissionId);
+
     let finalOutput = "";
+    let finalStdErr = "";
 
     // TODO: add a timeout so that if the user code takes more thatn 5 seconds to execute -> change status to DB as "TLE"
 
@@ -25,6 +27,9 @@ client.connect().then(async () => {
       console.log("Running users c++ code");
 
       const filePath = __dirname + "/code/a.cpp";
+      const outputPath = __dirname + "/code/out";
+
+      //create file
       fs.writeFileSync(filePath, code);
 
       // compile
@@ -32,127 +37,175 @@ client.connect().then(async () => {
 
       let exitCodeCompiler = null;
 
-      // check if compilation failed
-      await new Promise<void>((resolve) => {
-        processCompiler.on("exit", async (exitCode) => {
+      // if compilation throws error
+      processCompiler.stderr.on("data", (chunk) => {
+        finalStdErr += chunk.toString();
+      });
+
+      // Wait for compilation to finish
+      await new Promise<void>((resolve, reject) => {
+        processCompiler.on("error", reject);
+        processCompiler.on("close", (exitCode) => {
           exitCodeCompiler = exitCode;
-          if (exitCode != 0) {
-            await prisma.submission.update({
-              where: {
-                id: submissionId,
-              },
-              data: {
-                status: "Failure",
-              },
-            });
-          }
           resolve();
         });
       });
 
-      if (exitCodeCompiler != 0) {
+      // Compilation failed
+      if (exitCodeCompiler !== 0) {
+        await prisma.submission.update({
+          where: {
+            id: submissionId,
+          },
+          data: {
+            status: "Failure",
+            stdErr: finalStdErr,
+          },
+        });
         continue;
       }
 
       //run
-      let process = spawn("./code/out");
+      const process = spawn(outputPath);
+
+      // Stop programs that run longer than 5 seconds
+      let timeOut = false
+      const timer = setTimeout(() => {
+        timeOut = true
+        process.kill("SIGKILL")
+      }, 5000);
 
       //print
       process.stdout.on("data", (chunk) => {
         finalOutput += chunk.toString();
       });
 
-      await new Promise<void>((resolve) => {
-        process.on("exit", async () => {
-          await prisma.submission.update({
-            where: {
-              id: submissionId,
-            },
-            data: {
-              status: "Success",
-              output: finalOutput,
-            },
-          });
-        });
-        resolve();
+      // if error
+      process.stderr.on("data", (chunk) => {
+        finalStdErr += chunk.toString();
       });
+
+
+      await new Promise<void>((resolve, reject) => {
+        process.on("error", reject)
+        process.on("close", (exitCode) => {
+          clearTimeout(timer)
+          resolve()
+        })
+      })
+
+      const success = !timeOut && process.exitCode === 0
+
+      await prisma.submission.update({
+        where: {
+          id: submissionId
+        },
+        data: {
+          status: success ? "Success" : "Failure",
+          output: finalOutput,
+          stdErr: timeOut ? "Execution timeout after 5 secs" : finalStdErr
+        }
+      })
+
+      
     }
 
     if (language === "JS") {
-      console.log("Running users JS code");
+      let filePath = __dirname + "/code/a.js"
+      let finalOutput = ""
+      let finalStdErr = ""
+      
+      // write file
+      fs.writeFileSync(filePath, code)
 
-      const filePath = __dirname + "/code/a.js";
-      fs.writeFileSync(filePath, code);
+      //run file
+      const process = spawn("node", [filePath])
 
-      //start a new process
-      const process = spawn("node", [filePath]);
+      // Start timer of 5 secs
+      let timeOut = false
+      const timer = setTimeout(() => {
+          timeOut = true
+          process.kill("SIGKILL")
+      }, 5000);
+
       process.stdout.on("data", (chunk) => {
-        finalOutput += chunk.toString();
-      });
+        finalOutput += chunk.toString()
+      })
 
-      await new Promise<void>((resolve) => {
-        process.on("exit", async (exitCode) => {
-          if (exitCode == 0) {
-            await prisma.submission.update({
-              where: {
-                id: submissionId,
-              },
-              data: {
-                status: "Success",
-                output: finalOutput,
-              },
-            });
-          } else {
-            await prisma.submission.update({
-              where: {
-                id: submissionId,
-              },
-              data: {
-                status: "Failure",
-              },
-            });
-          }
-          resolve();
-        });
-      });
+      process.stderr.on("data" , (chunk) => {
+        finalStdErr += chunk.toString()
+      })
+
+      await new Promise<void>((resolve, reject) => {
+        process.on("error", reject)
+        process.on("close", () => {
+          clearTimeout(timer)
+          resolve()
+        })
+      })
+
+      const success = !timeOut && process.exitCode === 0
+
+      await prisma.submission.update({
+        where: {
+          id: submissionId
+        },
+        data: {
+          status: success ? "Success" : "Failure",
+          output: finalOutput,
+          stdErr: timeOut ? "Execution timed out after 5 secs" : finalStdErr
+        }
+      })
+
+
     }
 
     if (language == "Python") {
-      console.log("RUnning PY Code");
+      console.log("Running PY Code");
 
       const filePath = __dirname + "/code/a.py";
+      
       fs.writeFileSync(filePath, code);
 
       const process = spawn("python", [filePath]);
+
+      let timeOut = false
+      const timer = setTimeout(() => {
+        timeOut = true
+        process.kill("SIGKILL")
+      }, 5000);
+
+
       process.stdout.on("data", (chunk) => {
         finalOutput += chunk.toString();
       });
 
-      await new Promise<void>((resolve) => {
-        process.on("exit", async (exitCode) => {
-          if (exitCode == 0) {
-            await prisma.submission.update({
-              where: {
-                id: submissionId,
-              },
-              data: {
-                status: "Success",
-                output: finalOutput,
-              },
-            });
-          } else {
-            await prisma.submission.update({
-              where: {
-                id: submissionId,
-              },
-              data: {
-                status: "Failure",
-              },
-            });
-          }
-          resolve();
-        });
+      process.stderr.on("data", (chunk) => {
+        finalStdErr += chunk.toString()
+      })
+
+      
+
+      await new Promise<void>((resolve, reject) => {
+        process.on("error", reject)
+        process.on("close", () => {
+          clearTimeout(timer)
+          resolve()
+        })
       });
+
+      const success = !timeOut && process.exitCode === 0
+
+      await prisma.submission.update({
+        where: {
+          id: submissionId
+        },
+        data: {
+          status: success ? "Success" : "Failure",
+          output: finalOutput,
+          stdErr: timeOut ? "Execution timed out after 5 secs" : finalStdErr
+        }
+      })
     }
   }
 });
