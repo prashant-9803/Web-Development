@@ -46,12 +46,11 @@ client.connect().then(async () => {
               },
             });
           }
-          resolve()
+          resolve();
         });
       });
 
       if (exitCodeCompiler != 0) {
-        console.log("skipped");
         continue;
       }
 
@@ -113,8 +112,8 @@ client.connect().then(async () => {
               },
             });
           }
+          resolve();
         });
-        resolve();
       });
     }
 
@@ -151,8 +150,8 @@ client.connect().then(async () => {
               },
             });
           }
+          resolve();
         });
-        resolve();
       });
     }
   }
