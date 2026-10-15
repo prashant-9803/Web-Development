@@ -1,1 +1,1 @@
-prin('hi there mf')
+print('hi there mf')

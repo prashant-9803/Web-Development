@@ -1,6 +1,7 @@
 import express from "express";
 import redis, { createClient } from "redis";
 import { prisma } from "./db";
+import cors from "cors"
 
 const app = express();
 
@@ -9,6 +10,17 @@ const client = createClient();
 client.connect();
 
 app.use(express.json());
+app.use(cors())
+
+
+
+
+
+
+
+
+
+
 
 app.post("/submission", async (req, res) => {
   const { code, language } = req.body;
@@ -49,6 +61,6 @@ app.get("/submission/:submissionId", async (req, res) => {
   })
 });
 
-app.listen(3000, () => {
-  console.log("Server listnening on port 3000");
+app.listen(4000, () => {
+  console.log("Server listnening on port 4000");
 });

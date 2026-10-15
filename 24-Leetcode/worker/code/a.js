@@ -1,1 +1,1 @@
- function addNumbers(a, b) {return a + b;};  let sum = addNumbers(7, 62); console.log(sum); 
+console.log("ky be bhen ke lovede");
